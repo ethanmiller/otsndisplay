@@ -1,0 +1,79 @@
+#!/usr/bin/env python
+import serial, time, sys
+definitions = {
+	'00' : 'Power ON, normal',
+	'80' : 'Standby',
+	'40' : 'Countdown in process',
+	'20' : 'Cooling Down in process',
+	'10' : 'Power Failure',
+	'28' : 'Cooling down in process due to abnormal temperature',
+	'88' : 'Standby after Cooling down due to abnormal temperature',
+	'24' : 'Power-save cooling down in process',
+	'04' : 'Power Save',
+	'21' : 'Cooling down in process after OFF due to Lamp Failure',
+	'81' : 'Standby after cooling down due to lamp failure' 
+}
+s = serial.Serial(0)
+s.baudrate = 19200
+#try doing this before every operation??
+s.flushInput()
+s.flushOutput()
+
+def status(printable=True):
+	s.write('CR0\r')
+	time.sleep(6)
+	r = s.read()
+	while s.inWaiting() > 0:
+		tr = s.read()
+		if tr == '\r':
+			continue
+		else:
+			r = r + tr
+	try:
+		if printable:
+			return definitions[r]
+		else:
+			return r
+	except KeyError:
+		print "Unidentified response character: %s" % r
+
+def testcyc():
+	if status(False) != '00':
+		# we're not on, turn on and wait a minute
+		s.write('C00\r')
+		print 'Powering on'
+		time.sleep(300)
+	# turn off
+	print 'Powering off'
+	s.write('C01\r')
+	time.sleep(300)
+	print 'Powering on'
+	s.write('C00\r')
+
+def main():
+        import getopt
+        def usage():
+                print "Control and testing for PLC XP57L Projector"
+                print "usage: otsnproj.py [arguments]"
+                print "-h or --help", "Print this help message"
+		print "-s", "Print status"
+		print "--on", "Turn projector on"
+		print "--off", "Turn projector off"
+		print "-t", "Test cycle (off one min, on for one min)"
+		print "\n"
+        (opts, args) = getopt.getopt(sys.argv[1:], 'hst', ['help', 'on', 'off'])
+        for (k, v) in opts:
+		if k == '-s':
+			print status()
+		elif k == '--on':
+			s.write('C00\r') # on
+		elif k == '--off':
+			s.write('C01\r') # off
+		elif k == '-t':
+			testcyc()
+                else:
+                        usage()
+			
+
+if __name__ == '__main__' :
+        main()
