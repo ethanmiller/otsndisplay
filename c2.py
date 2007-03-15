@@ -42,58 +42,58 @@ class World:
 		# s.write('C00\r')
 		# s.close()
 
-		parser = xml.sax.make_parser()
-		handler = XMLDataHandler()
-		parser.setContentHandler(handler)
+		self.parser = xml.sax.make_parser()
+		self.handler = XMLDataHandler()
+		self.parser.setContentHandler(self.handler)
 
-		words = {}
-		domains = {}
-		links = {}
-		offset = 0
-		time = None
-		last_update = None
+		self.words = {}
+		self.domains = {}
+		self.links = {}
+		self.offset = 0
+		self.time = None
+		self.last_update = None
 	
 		pygame.init()
-		font_sm = pygame.font.Font("resources/arialbd.ttf",10) 
-		font_lg = pygame.font.Font("resources/arialbd.ttf",30)
+		self.font_sm = pygame.font.Font("resources/arialbd.ttf",10) 
+		self.font_lg = pygame.font.Font("resources/arialbd.ttf",30)
 		pygame.display.set_caption('SocialVis 0.2') 
-		screen = pygame.display.set_mode((1024,768),FULLSCREEN)
-		#screen = pygame.display.set_mode((1024,768))
+		self.screen = pygame.display.set_mode((1024,768),FULLSCREEN)
+		#self.screen = pygame.display.set_mode((1024,768))
 		pygame.mouse.set_visible(False)
 		 
-		background = pygame.Surface(screen.get_size())
-		background = background.convert()
-		background.fill((0,0,0))
+		self.background = pygame.Surface(self.screen.get_size())
+		self.background = self.background.convert()
+		self.background.fill((0,0,0))
 	
-		map_background = pygame.Surface((screen.get_width(),(screen.get_width()*.3625)*map_offset))
-		map_background = map_background.convert()
-		map_background.fill((0,0,0))
+		self.map_background = pygame.Surface((self.screen.get_width(),(self.screen.get_width()*.3625)*self.map_offset))
+		self.map_background = self.map_background.convert()
+		self.map_background.fill((0,0,0))
 			
-		map = pygame.Surface((screen.get_width(),(screen.get_width()*.3625)*map_offset))
-		map = map.convert()
-		map.set_colorkey((255,0,0))
-		map.fill((255,0,0))
+		self.map = pygame.Surface((self.screen.get_width(),(self.screen.get_width()*.3625)*self.map_offset))
+		self.map = self.map.convert()
+		self.map.set_colorkey((255,0,0))
+		self.map.fill((255,0,0))
 	
-		map_tags = pygame.Surface((screen.get_width(),(screen.get_width()*.3625)*map_offset))
-		map_tags = map.convert()
-		map_tags.fill((255,0,0))
+		self.map_tags = pygame.Surface((self.screen.get_width(),(self.screen.get_width()*.3625)*self.map_offset))
+		self.map_tags = self.map.convert()
+		self.map_tags.fill((255,0,0))
 			
-		info_top = pygame.Surface((screen.get_width(),(screen.get_height()-map.get_height())/2.0))
-		info_top = info_top.convert()
-		info_top.fill((0,0,0))
+		self.info_top = pygame.Surface((self.screen.get_width(),(self.screen.get_height()-self.map.get_height())/2.0))
+		self.info_top = self.info_top.convert()
+		self.info_top.fill((0,0,0))
 		
-		info_bottom = pygame.Surface((screen.get_width(),(screen.get_height()-map.get_height())/2.0))
-		info_bottom = info_bottom.convert()
-		info_bottom.fill((0,0,0))
+		self.info_bottom = pygame.Surface((self.screen.get_width(),(self.screen.get_height()-self.map.get_height())/2.0))
+		self.info_bottom = self.info_bottom.convert()
+		self.info_bottom.fill((0,0,0))
 	
-		image_inactive = pygame.Surface((10,10))
-		image_inactive.fill((255,0,0))
-		image_inactive.set_colorkey((255,0,0))
-		pygame.draw.circle(image_inactive,[100,100,100],(5,5),5,1)
+		self.image_inactive = pygame.Surface((10,10))
+		self.image_inactive.fill((255,0,0))
+		self.image_inactive.set_colorkey((255,0,0))
+		pygame.draw.circle(self.image_inactive,[100,100,100],(5,5),5,1)
 	
-		update("resources/words.xml")
-		current_word = [x for x in getWord() if x.color_index == 0][0]
-		draw()
+		self.update("resources/words.xml")
+		self.current_word = [x for x in self.getWord() if x.color_index == 0][0]
+		self.draw()
 	def draw(self):
 		while True:
 			n = datetime.datetime.now()
