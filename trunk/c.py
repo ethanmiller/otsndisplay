@@ -58,6 +58,7 @@ class World:
 		self.font_lg = pygame.font.Font("resources/arialbd.ttf",30)
 		pygame.display.set_caption('SocialVis 0.2') 
 		self.screen = pygame.display.set_mode((1024,768),FULLSCREEN)
+		#self.screen = pygame.display.set_mode((1024,768))
 		pygame.mouse.set_visible(False)
 		 
 		self.background = pygame.Surface(self.screen.get_size())
