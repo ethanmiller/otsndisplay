@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from p import *
-import pygame, sys, os, time, math, random, serial, datetime
+import pygame, sys, os, time, math, random, datetime
 from pygame.locals import *
 
 def rgb_sort(l):
@@ -37,10 +37,6 @@ def rgb_hsb(l):
 class World:
 	def __init__ (self,map_offset=1.1):
 		self.map_offset = map_offset
-		
-		# s.open()
-		# s.write('C00\r')
-		# s.close()
 
 		self.parser = xml.sax.make_parser()
 		self.handler = XMLDataHandler()
@@ -91,7 +87,7 @@ class World:
 		self.image_inactive.set_colorkey((255,0,0))
 		pygame.draw.circle(self.image_inactive,[100,100,100],(5,5),5,1)
 	
-		self.update("resources/words.xml")
+		self.update("resources/words_new.xml")
 		self.current_word = [x for x in self.getWord() if x.color_index == 0][0]
 		self.draw()
 	def draw(self):
@@ -103,11 +99,6 @@ class World:
 				if event.type == QUIT:
 					sys.exit(0)
 				if event.type == KEYDOWN:
-					if event.key == K_t:
-						# s.open()
-						# s.write('C01\r')
-						# s.close()
-						sys.exit(0)
 					if event.key == K_q:
 						sys.exit(0)
 					if event.key == K_UP:
@@ -133,7 +124,7 @@ class World:
 			# Cleanup for the next word. Wait before moving on.
 			if len([x for x in self.getLink(self.current_word) if x.line.isDone() and x.tag.isSettled()]) == len(self.getLink(self.current_word)):
 				if time.time() - self.last_update >= 14400:
-					self.update("resources/words.xml")
+					self.update("resources/words_new.xml")
 				else:
 					if self.time == None:
 						self.time = time.time()
@@ -200,6 +191,10 @@ class World:
 		for word in self.handler.getWords():
 			avgs = {"militaristic" : 0.0, "cultural" : 0.0, "economic" : 0.0, "technological" : 0.0, "weight" : 0.0}
 			for domain in word["domains"]:
+				dom = self.getDomain(domain["domain_id"])
+				if not dom: continue
+				rating = dom.rating
+
 				rating = self.getDomain(domain["domain_id"]).rating
 				domain_weight = int(domain["pages_w_word"])/float(self.getDomain(domain["domain_id"]).pgs_scanned)
 				avgs["militaristic"] += rating["militaristic"]*domain_weight
@@ -442,7 +437,7 @@ class DomainMarker:
 	def render(self):
 		if not self.rendered:
 			if float(self.parent.parent.map.get_width())/len(self.parent.parent.getLink(self.parent.parent.current_word)) > 10:
-				width = 10
+				width = 5
 			else:
 				width = float(self.parent.parent.map.get_width())/len(self.parent.parent.getLink(self.parent.parent.current_word))
 			if 85.0/(self.parent.parent.current_word.most_pgs_scanned/self.parent.pgs_scanned) < 1:
@@ -462,11 +457,11 @@ class DomainMarker:
 			if self.parent.parent.current_word.render_marker_right:
 				self.x = mid+((active_markers*width)/2.0)
 				self.y = self.render_surface.get_height()-self.image.get_height()
-				self.render_surface.blit(self.image,(self.x,self.y))
+				self.render_surface.blit(self.image,(self.x+1,self.y))
 			else:
 				self.x = mid-(((active_markers+1)*width)/2.0)
 				self.y = self.render_surface.get_height()-self.image.get_height()
-				self.render_surface.blit(self.image,(self.x,self.y))
+				self.render_surface.blit(self.image,(self.x+1,self.y))
 			self.rendered = True
 
 			if self.parent.parent.current_word.render_marker_right:
@@ -477,9 +472,12 @@ class DomainMarker:
 class DomainTag:
 	def __init__(self,parent,render_surface):
 		self.parent = parent
-		self.render_surface = render_surface		
+		self.render_surface = render_surface
+
 		self.x = (render_surface.get_width()*((self.parent.loc["lon"]+180.0)/360.0)) + 5
-		self.y = (render_surface.get_height()*(((self.parent.loc["lat"]*-1.0)+90)/180)) - 9
+		self.y = (render_surface.get_height()*(((self.parent.loc["lat"]*-1.0)+90)/180.0)) - 9
+
+		
 		self.settled = True		
 
 		self.font = self.parent.parent.font_sm
@@ -491,6 +489,13 @@ class DomainTag:
 		self.image = pygame.Surface((self.text.get_width()+5,self.text.get_height()+1))
 		self.image.set_colorkey([255,0,0])
 		self.image.fill((255,0,0))
+
+		if self.y > render_surface.get_height()/2.0:
+			self.y += self.image.get_height()
+		
+		if self.x + self.image.get_width() > self.parent.parent.screen.get_width():
+			self.x = self.x - self.image.get_width() - 10
+		
 		self.image.blit(self.text,((self.image.get_width() - self.text.get_width())/2.0,1))
 		
 	def adjPos(self, xadj, yadj):
@@ -524,13 +529,14 @@ class DomainTag:
 					dist = math.sqrt(xdiff*xdiff + ydiff*ydiff)
 					pushx = xdiff*(force/2)*0.5
 					pushy = ydiff*force*0.5
-					if self.x -pushx < 0 or self.x -pushx > self.parent.parent.map_tags.get_width() or self.y - pushy < 0 or self.y -pushy > self.parent.parent.map_tags.get_height(): 
+					if self.x - pushx < 0 or self.x - pushx > self.parent.parent.map_tags.get_width() - self.image.get_width() or self.y - pushy < 0 or self.y -pushy > self.parent.parent.map_tags.get_height() - self.image.get_height(): 
 						if self.x -pushx < 0 or self.x -pushx > self.parent.parent.map_tags.get_width():
 							self.adjPos(0, -pushy)
 						if self.y - pushy < 0 or self.y -pushy > self.parent.parent.map_tags.get_height():
-							self.adjPos(-pushx, 0)
+							if not self.x - pushx > self.screen.get_width() - self.image.get_width():
+								self.adjPos(-pushx, 0)
 					
-					if tag2.x -pushx < 0 or tag2.x -pushx > tag2.parent.parent.map_tags.get_width() or tag2.y - pushy < 0 or tag2.y -pushy > tag2.parent.parent.map_tags.get_height(): 
+					if tag2.x -pushx < 0 or tag2.x -pushx > tag2.parent.parent.map_tags.get_width() - self.image.get_width() or tag2.y - pushy < 0 or tag2.y -pushy > tag2.parent.parent.map_tags.get_height() - self.image.get_height(): 
 						if tag2.x -pushx < 0 or tag2.x -pushx > tag2.parent.parent.map_tags.get_width():
 							tag2.adjPos(0, -pushy)
 						if tag2.y - pushy < 0 or tag2.y -pushy > tag2.parent.parent.map_tags.get_height():
@@ -571,7 +577,7 @@ class DomainLine:
 		self.image = pygame.Surface(render_surface.get_size())
 		self.image.set_colorkey([0,0,0])
 		self.line_pts = points
-		self.line_pts.append((self.parent.getRelX(self.parent.parent.map),self.parent.getRelY(self.parent.parent.map)))
+		self.line_pts.append((self.parent.dot.x+(self.parent.dot.image.get_width()/2.0),self.parent.dot.y+2))
 		self.active_pts = ()
 		self.addSegment()
 	def resetLine(self):
@@ -662,7 +668,7 @@ class Domain:
 		return (render_surface.get_width()*((self.loc["lon"]+180.0)/360.0))
 	def getRelY(self,render_surface):
 		y = (render_surface.get_height()*(((self.loc["lat"]*-1.0)+90)/180))
-		if y > (render_surface.get_height()/2):
+		if y > (render_surface.get_height()/2.0):
 			y+=15
 		return y
 		
