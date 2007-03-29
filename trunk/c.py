@@ -87,14 +87,14 @@ class World:
 		self.image_inactive.set_colorkey((255,0,0))
 		pygame.draw.circle(self.image_inactive,[100,100,100],(5,5),5,1)
 	
-		self.update("resources/words_new.xml")
+		self.update("resources/words.xml")
 		self.current_word = [x for x in self.getWord() if x.color_index == 0][0]
 		self.draw()
 	def draw(self):
 		while True:
 			n = datetime.datetime.now()
-			if n.hour >= 20:
-				sys.exit(0)
+			#if n.hour >= 20:
+			#	sys.exit(0)
 			for event in pygame.event.get():
 				if event.type == QUIT:
 					sys.exit(0)
@@ -124,7 +124,7 @@ class World:
 			# Cleanup for the next word. Wait before moving on.
 			if len([x for x in self.getLink(self.current_word) if x.line.isDone() and x.tag.isSettled()]) == len(self.getLink(self.current_word)):
 				if time.time() - self.last_update >= 14400:
-					self.update("resources/words_new.xml")
+					self.update("resources/words.xml")
 				else:
 					if self.time == None:
 						self.time = time.time()
