@@ -54,7 +54,7 @@ class World:
 		self.font_lg = pygame.font.Font("resources/arialbd.ttf",30)
 		pygame.display.set_caption('SocialVis 0.2') 
 		self.screen = pygame.display.set_mode((1024,768),FULLSCREEN)
-		#self.screen = pygame.display.set_mode((1024,768))
+		#self.screen = pygame.display.set_mode((800, 600))
 		pygame.mouse.set_visible(False)
 		 
 		self.background = pygame.Surface(self.screen.get_size())
@@ -92,9 +92,9 @@ class World:
 		self.draw()
 	def draw(self):
 		while True:
-			n = datetime.datetime.now()
-			#if n.hour >= 20:
-			#	sys.exit(0)
+			#n = datetime.datetime.now()
+			#if n.hour >= 12:
+				#sys.exit(0)
 			for event in pygame.event.get():
 				if event.type == QUIT:
 					sys.exit(0)
@@ -615,7 +615,7 @@ class Domain:
 		pygame.draw.polygon(self.ratio,[128,128,128],((0,0),(self.ratio.get_width(),0),(self.ratio.get_width(),self.ratio.get_height()-10),(self.ratio.get_width()/2.0,self.ratio.get_height()),(0,self.ratio.get_height()-10)))		
 	def curve_points(self,start, end):
 		midpoint_variance, curve_push = (20, 30)
-		base_divisions, add_divisions = (40, 40)
+		base_divisions, add_divisions = (80, 60)
 
 		divisions = random.randint(base_divisions, base_divisions + add_divisions)
 		# determine control points

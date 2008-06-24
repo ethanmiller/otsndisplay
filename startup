@@ -1,0 +1,11 @@
+#!/bin/bash
+# date +%w -- 0 = Sunday ... we'll run this on Mondays (1)
+DAY=`date +%w`
+if [ $DAY -eq 2 ]; then
+	#scp here depends on having ssh keys generated for password-less login
+	scp otsn.sjsu.edu:/var/www/media/xml/words.xml /home/display/otsndisplay/resources/words.xml
+fi
+
+# run otsn
+export DISPLAY=:0.0
+cd /home/display/otsndisplay/;python c.py
