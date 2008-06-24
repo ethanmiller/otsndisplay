@@ -2,6 +2,8 @@
 # date +%w -- 0 = Sunday ... we'll run this on Mondays (1)
 DAY=`date +%w`
 if [ $DAY -eq 2 ]; then
+	#sleep a minute to make sure we got network
+	sleep 60
 	#scp here depends on having ssh keys generated for password-less login
 	scp otsn.sjsu.edu:/var/www/media/xml/words.xml /home/display/otsndisplay/resources/words.xml
 fi
