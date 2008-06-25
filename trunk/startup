@@ -1,7 +1,7 @@
 #!/bin/bash
 # date +%w -- 0 = Sunday ... we'll run this on Mondays (1)
 DAY=`date +%w`
-if [ $DAY -eq 2 ]; then
+if [ $DAY -eq 1 ]; then
 	#sleep a minute to make sure we got network
 	sleep 60
 	#scp here depends on having ssh keys generated for password-less login
