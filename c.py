@@ -35,7 +35,7 @@ def rgb_hsb(l):
 	return (H,S,B)
 
 class World:
-	def __init__ (self,map_offset=1.1):
+	def __init__ (self,map_offset=1.4):
 		self.map_offset = map_offset
 
 		self.parser = xml.sax.make_parser()
@@ -50,8 +50,8 @@ class World:
 		self.last_update = None
 	
 		pygame.init()
-		self.font_sm = pygame.font.Font("resources/arialbd.ttf",10) 
-		self.font_lg = pygame.font.Font("resources/arialbd.ttf",30)
+		self.font_sm = pygame.font.Font("resources/FreeSans.ttf",12) 
+		self.font_lg = pygame.font.Font("resources/FreeSans.ttf",30)
 		pygame.display.set_caption('SocialVis 0.2') 
 		self.screen = pygame.display.set_mode((1024,768),FULLSCREEN)
 		#self.screen = pygame.display.set_mode((800, 600))
@@ -99,7 +99,7 @@ class World:
 				if event.type == QUIT:
 					sys.exit(0)
 				if event.type == KEYDOWN:
-					if event.key == K_q:
+					if event.key in [K_ESCAPE, K_q]:
 						sys.exit(0)
 					if event.key == K_UP:
 						map_offset = self.map_offset + 0.1
@@ -251,7 +251,8 @@ class WordRating:
 		self.render_surface = render_surface
 		self.rendered = False		
 
-		self.font = self.parent.parent.font_sm
+		#self.font = self.parent.parent.font_sm
+		self.font = pygame.font.Font("resources/FreeSans.ttf",10) 
 		self.image = pygame.Surface((195,55))
 		self.bar = pygame.Surface((100,10))
 		self.bar.fill([0,0,0])
@@ -262,7 +263,7 @@ class WordRating:
 		self.text = self.font.render("TECHNOLOGICAL",1,[255,255,255])
 		self.image.blit(self.bar,(self.image.get_width()-self.bar.get_width(),0))
 		self.image.blit(self.bar_fill,(self.image.get_width()-self.bar.get_width(),0))
-		self.image.blit(self.text,(self.image.get_width()-self.bar.get_width()-self.text.get_width()-5,-3))
+		self.image.blit(self.text,(self.image.get_width()-self.bar.get_width()-self.text.get_width()-5,0))
 
 		pygame.draw.rect(self.bar,[0,255,0],self.bar.get_rect(),1)
 		self.bar_fill = pygame.Surface((self.parent.rating["militaristic"]*self.bar.get_width(),self.bar.get_height()))
@@ -270,7 +271,7 @@ class WordRating:
 		self.text = self.font.render("MILITARISTIC",1,[255,255,255])
 		self.image.blit(self.bar,(self.image.get_width()-self.bar.get_width(),self.bar.get_height()+5))
 		self.image.blit(self.bar_fill,(self.image.get_width()-self.bar.get_width(),self.bar.get_height()+5))
-		self.image.blit(self.text,(self.image.get_width()-self.bar.get_width()-self.text.get_width()-5,self.bar.get_height()+5-3))
+		self.image.blit(self.text,(self.image.get_width()-self.bar.get_width()-self.text.get_width()-5,self.bar.get_height()+5))
 
 		pygame.draw.rect(self.bar,[0,0,255],self.bar.get_rect(),1)
 		self.bar_fill = pygame.Surface((self.parent.rating["cultural"]*self.bar.get_width(),self.bar.get_height()))
@@ -278,7 +279,7 @@ class WordRating:
 		self.text = self.font.render("CULTURAL",1,[255,255,255])
 		self.image.blit(self.bar,(self.image.get_width()-self.bar.get_width(),(self.bar.get_height()*2)+10))
 		self.image.blit(self.bar_fill,(self.image.get_width()-self.bar.get_width(),(self.bar.get_height()*2)+10))
-		self.image.blit(self.text,(self.image.get_width()-self.bar.get_width()-self.text.get_width()-5,(self.bar.get_height()*2)+10-3))
+		self.image.blit(self.text,(self.image.get_width()-self.bar.get_width()-self.text.get_width()-5,(self.bar.get_height()*2)+10))
 
 		pygame.draw.rect(self.bar,[255,255,255],self.bar.get_rect(),1)
 		self.bar_fill = pygame.Surface((self.parent.rating["economic"]*self.bar.get_width(),self.bar.get_height()))
@@ -286,7 +287,7 @@ class WordRating:
 		self.text = self.font.render("ECONOMIC",1,[255,255,255])
 		self.image.blit(self.bar,(self.image.get_width()-self.bar.get_width(),(self.bar.get_height()*3)+15))
 		self.image.blit(self.bar_fill,(self.image.get_width()-self.bar.get_width(),(self.bar.get_height()*3)+15))
-		self.image.blit(self.text,(self.image.get_width()-self.bar.get_width()-self.text.get_width()-5,(self.bar.get_height()*3)+15-3))
+		self.image.blit(self.text,(self.image.get_width()-self.bar.get_width()-self.text.get_width()-5,(self.bar.get_height()*3)+15))
 	def render(self):
 		if not self.rendered:
 			self.render_surface.blit(self.image,(self.x-3,self.y))
@@ -377,9 +378,9 @@ class Word:
 		self.marker_offset_right = 0
 		self.render_marker_right = True	
 	def render(self):
-		self.rating_bars.render()
 		self.title.render()
 		self.text_clip.render()
+		self.rating_bars.render()
 		#self.color_line.render()
 		i = 0
 		while i < len(self.parent.getWord()):
