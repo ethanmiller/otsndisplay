@@ -35,7 +35,7 @@ def rgb_hsb(l):
 	return (H,S,B)
 
 class World:
-	def __init__ (self,map_offset=1.4):
+	def __init__ (self,map_offset=1.3):
 		self.map_offset = map_offset
 
 		self.parser = xml.sax.make_parser()
@@ -112,11 +112,12 @@ class World:
 					self.map_background.blit(self.image_inactive,(domain.getRelPos(self.map_background)))
 				self.current_word.render()	
 				#blit down
-				self.screen.blit(self.map_background,(0,(self.screen.get_height() - self.map.get_height())/2.0))
-				self.screen.blit(self.map,(0,(self.screen.get_height() - self.map.get_height())/2.0))
-				self.screen.blit(self.map_tags,(0,(self.screen.get_height() - self.map.get_height())/2.0))
-				self.screen.blit(self.info_top,(0,0))
-				self.screen.blit(self.info_bottom,(0,((self.screen.get_height() - self.map.get_height())/2.0) + self.map.get_height()))
+				maph = (self.screen.get_height() - self.map.get_height())/1.7
+				self.screen.blit(self.map_background,(0, maph))
+				self.screen.blit(self.map,(0, maph))
+				self.screen.blit(self.map_tags,(0, maph))
+				self.screen.blit(self.info_top,(0, 25))
+				self.screen.blit(self.info_bottom,(0, maph + self.map.get_height()))
 				
 				pygame.display.flip()
 				self.map_tags.fill((255,0,0))
